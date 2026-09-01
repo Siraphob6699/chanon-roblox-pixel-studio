@@ -541,6 +541,7 @@
         </label>
         <button id="resizeImage" class="ghost" type="button" disabled>ปรับให้เข้าตาราง</button>
         <button id="naturalSize" class="ghost" type="button" disabled>ขนาดจริง</button>
+        <button id="exportPlan" class="ghost" type="button" disabled>ดาวน์โหลดแผนออโต้</button>
         <button id="clearMarks" class="ghost" type="button" disabled>ล้างจุด</button>
       </div>
 
@@ -614,6 +615,7 @@
     const heightInput = document.getElementById('heightInput');
     const resizeImage = document.getElementById('resizeImage');
     const naturalSize = document.getElementById('naturalSize');
+    const exportPlan = document.getElementById('exportPlan');
     const clearMarks = document.getElementById('clearMarks');
     const imageWrap = document.getElementById('imageWrap');
     const empty = document.getElementById('empty');
@@ -761,6 +763,7 @@
       widthInput.value = String(width);
       heightInput.value = String(height);
       resetPickedState();
+      exportPlan.disabled = false;
       applyZoom();
     }
 
@@ -1030,6 +1033,38 @@
       history.innerHTML = '';
       countValue.textContent = '-';
       clearMarks.disabled = true;
+    });
+
+    exportPlan.addEventListener('click', () => {
+      if (!imageReady || !canvas.width || !canvas.height) return;
+
+      const data = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+      const pixels = [];
+      for (let y = 0; y < canvas.height; y += 1) {
+        for (let x = 0; x < canvas.width; x += 1) {
+          const index = (y * canvas.width + x) * 4;
+          pixels.push({
+            x,
+            y,
+            hex: rgbToHex(data[index], data[index + 1], data[index + 2])
+          });
+        }
+      }
+
+      const plan = {
+        format: 'chanon-pixel-automation/v1',
+        width: canvas.width,
+        height: canvas.height,
+        createdAt: new Date().toISOString(),
+        pixels
+      };
+      const blob = new Blob([JSON.stringify(plan, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `chanon-pixel-plan-${canvas.width}x${canvas.height}.json`;
+      link.click();
+      URL.revokeObjectURL(url);
     });
   </script>
 </body>
