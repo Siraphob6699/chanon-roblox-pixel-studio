@@ -30,14 +30,14 @@
       <div class="field"><label for="passcode">กรอกรหัสเพื่อเข้า STAR Budget</label><input id="passcode" type="password" inputmode="numeric" autocomplete="off" maxlength="12" placeholder="กรอกรหัส"></div>
       <div class="actions"><button class="btn pink" id="enterBudget" type="button">เข้าสู่หน้ารายรับรายจ่าย</button></div>
       <div id="error" class="error"></div>
-</article>
+    </article>
   </div>
 </section>
 </main>
 <script>
 async function sha256(text){const data=new TextEncoder().encode(text);const digest=await crypto.subtle.digest('SHA-256',data);return [...new Uint8Array(digest)].map(b=>b.toString(16).padStart(2,'0')).join('')}
 const input=document.getElementById('passcode'),error=document.getElementById('error');
-async function go(){error.textContent='';const hash=await sha256(input.value.trim());if(hash==='ec9c3833d2daef77604a3cfc097bbc5e919e4c96e8fd13bc34fdf0a2e4474e79'){sessionStorage.setItem('star-budget-auth','ok');location.href='./budget.html'}else{error.textContent='รหัสไม่ถูกต้อง กรุณาลองใหม่';input.focus();input.select()}}
+async function go(){error.textContent='';const pass=input.value.trim();const hash=await sha256(pass);if(hash==='ec9c3833d2daef77604a3cfc097bbc5e919e4c96e8fd13bc34fdf0a2e4474e79'){sessionStorage.setItem('star-budget-auth','ok');sessionStorage.setItem('star-budget-passcode',pass);location.href='./budget.html'}else{error.textContent='รหัสไม่ถูกต้อง กรุณาลองใหม่';input.focus();input.select()}}
 document.getElementById('enterBudget').addEventListener('click',go);input.addEventListener('keydown',e=>{if(e.key==='Enter')go()});
 </script>
 </body></html>
