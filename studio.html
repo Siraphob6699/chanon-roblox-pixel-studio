@@ -1,0 +1,1547 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Chanon Roblox Pixel Studio</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --ink: #f7f7ff;
+      --muted: #aeb6cf;
+      --line: rgba(147, 157, 205, .24);
+      --panel: #101323;
+      --soft: rgba(32, 38, 65, .78);
+      --field: #0c0f1c;
+      --accent: #8b7cff;
+      --accent-strong: #6d55f6;
+      --mark: rgba(125, 104, 255, .32);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at 12% 8%, rgba(100, 73, 255, .19), transparent 28rem),
+        radial-gradient(circle at 86% 88%, rgba(29, 185, 255, .12), transparent 26rem),
+        #090b15;
+      color: var(--ink);
+    }
+
+    button,
+    input,
+    select {
+      font: inherit;
+    }
+
+    .app {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 360px;
+      gap: 0;
+    }
+
+    .stage {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      border-right: 1px solid var(--line);
+      background: linear-gradient(180deg, rgba(19, 23, 42, .96), rgba(12, 15, 29, .98));
+    }
+
+    .toolbar {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-height: 76px;
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--line);
+      background: rgba(21, 25, 47, .88);
+      backdrop-filter: blur(14px);
+      flex-wrap: wrap;
+    }
+
+    .top-brand {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      margin-right: 8px;
+      padding-right: 19px;
+      border-right: 1px solid var(--line);
+      white-space: nowrap;
+    }
+
+    .top-brand-badge {
+      width: 42px;
+      height: 42px;
+      display: grid;
+      place-items: center;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #a28cff, #4775ff);
+      box-shadow: 0 7px 22px rgba(98, 80, 245, .38);
+      color: #fff;
+      font-weight: 950;
+      letter-spacing: -.06em;
+    }
+
+    .top-brand-name {
+      color: #fff;
+      font-size: 22px;
+      font-weight: 900;
+      line-height: 1;
+      letter-spacing: -.045em;
+    }
+
+    .top-brand-name span {
+      display: block;
+      margin-top: 5px;
+      color: #aeb9ff;
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+    }
+
+    .file {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 42px;
+      padding: 0 16px;
+      border-radius: 11px;
+      background: linear-gradient(135deg, #8c74ff, #5268ff);
+      box-shadow: 0 8px 22px rgba(92, 75, 245, .30);
+      color: white;
+      font-weight: 700;
+      cursor: pointer;
+      overflow: hidden;
+    }
+
+    .file input {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      cursor: pointer;
+    }
+
+    .control {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      color: var(--muted);
+      font-size: 14px;
+      white-space: nowrap;
+    }
+
+    .control input {
+      width: 150px;
+      accent-color: var(--accent);
+    }
+
+    .size-box {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      color: var(--muted);
+      font-size: 14px;
+      white-space: nowrap;
+    }
+
+    .size-box input {
+      width: 72px;
+      min-height: 42px;
+      padding: 0 10px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      color: var(--ink);
+      background: var(--field);
+    }
+
+    .ghost {
+      min-height: 42px;
+      padding: 0 13px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--field);
+      color: var(--ink);
+      cursor: pointer;
+      transition: border-color .18s ease, background .18s ease, transform .18s ease;
+    }
+
+    .ghost:not(:disabled):hover { border-color: rgba(153, 137, 255, .85); background: #171b31; transform: translateY(-1px); }
+    .file:hover { filter: brightness(1.1); transform: translateY(-1px); }
+
+    .ghost:disabled {
+      color: #596273;
+      cursor: default;
+    }
+
+    .workspace {
+      position: relative;
+      flex: 1;
+      min-height: 0;
+      overflow: auto;
+      padding: 22px;
+      background:
+        linear-gradient(45deg, #0f1722 25%, transparent 25%),
+        linear-gradient(-45deg, #0f1722 25%, transparent 25%),
+        linear-gradient(45deg, transparent 75%, #0f1722 75%),
+        linear-gradient(-45deg, transparent 75%, #0f1722 75%);
+      background-color: #0b1017;
+      background-size: 32px 32px;
+      background-position: 0 0, 0 16px, 16px -16px, -16px 0;
+    }
+
+    .image-wrap {
+      position: relative;
+      display: inline-block;
+      min-width: 360px;
+      min-height: 240px;
+      background: #0d1420;
+      border: 1px solid var(--line);
+      box-shadow: 0 18px 42px rgba(0, 0, 0, .28);
+      transform-origin: top left;
+      user-select: none;
+    }
+
+    .empty {
+      width: 600px;
+      max-width: calc(100vw - 390px);
+      height: 390px;
+      display: grid;
+      place-items: center;
+      padding: 30px;
+      color: var(--muted);
+      text-align: center;
+    }
+
+    canvas {
+      display: none;
+    }
+
+    .image-canvas {
+      display: block;
+      image-rendering: pixelated;
+      image-rendering: crisp-edges;
+      cursor: crosshair;
+    }
+
+    .marks {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+    }
+
+    .grid {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      opacity: .78;
+    }
+
+    .resize-dialog {
+      width: min(1120px, calc(100vw - 32px));
+      max-height: calc(100vh - 32px);
+      padding: 0;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      color: var(--ink);
+      background: #111925;
+      box-shadow: 0 24px 70px rgba(0, 0, 0, .58);
+      overflow: auto;
+    }
+
+    .resize-dialog::backdrop {
+      background: rgba(3, 7, 13, .76);
+      backdrop-filter: blur(3px);
+    }
+
+    .dialog-content { padding: 22px; }
+    .dialog-content h2 { margin: 0 0 8px; font-size: 20px; }
+    .dialog-content p { margin: 0 0 18px; color: var(--muted); line-height: 1.55; }
+    .dialog-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .dialog-field { display: grid; gap: 7px; color: var(--muted); font-size: 14px; }
+    .dialog-field input {
+      min-height: 46px;
+      padding: 0 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      color: var(--ink);
+      background: var(--field);
+    }
+    .dialog-field select {
+      min-height: 46px;
+      padding: 0 38px 0 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      color: var(--ink);
+      background: var(--field);
+    }
+    .preset-row { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0 2px; }
+    .preset {
+      min-height: 34px;
+      padding: 0 11px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      color: var(--muted);
+      background: var(--field);
+      cursor: pointer;
+    }
+    .preset:hover, .preset.is-active { border-color: var(--accent); color: #fff; background: rgba(109, 85, 246, .22); }
+    .pixelify-layout { display: grid; grid-template-columns: minmax(0, 1.65fr) minmax(240px, .75fr); gap: 16px; margin-top: 16px; }
+    .pixel-preview-panel {
+      min-width: 0;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--field);
+    }
+    .pixel-preview-head { display: flex; justify-content: space-between; gap: 10px; margin-bottom: 10px; color: var(--muted); font-size: 13px; }
+    .pixel-preview-wrap {
+      min-height: 260px;
+      display: grid;
+      place-items: center;
+      overflow: auto;
+      border-radius: 7px;
+      background-color: #0a0d16;
+      background-image: linear-gradient(45deg, #151a27 25%, transparent 25%), linear-gradient(-45deg, #151a27 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #151a27 75%), linear-gradient(-45deg, transparent 75%, #151a27 75%);
+      background-size: 20px 20px;
+      background-position: 0 0, 0 10px, 10px -10px, -10px 0;
+    }
+    .pixel-preview-canvas { display: block; max-width: 100%; max-height: 420px; image-rendering: pixelated; image-rendering: crisp-edges; }
+    .snap-state { margin-top: 10px; color: #8ee6bd; font-size: 12px; line-height: 1.45; }
+    .adjustments {
+      margin-top: 14px;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: rgba(12, 15, 28, .72);
+    }
+    .adjustments-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
+    .adjustments-head strong { font-size: 14px; }
+    .adjustment-grid { display: grid; grid-template-columns: repeat(5, minmax(120px, 1fr)); gap: 12px; }
+    .adjustment { display: grid; grid-template-columns: 1fr auto; gap: 6px 8px; color: var(--muted); font-size: 12px; }
+    .adjustment input { grid-column: 1 / -1; width: 100%; accent-color: var(--accent); }
+    .adjustment output { color: #fff; font-variant-numeric: tabular-nums; }
+    .resize-summary {
+      margin: 16px 0;
+      padding: 11px 12px;
+      border-radius: 8px;
+      background: var(--soft);
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.45;
+    }
+    .crop-help { margin-top: 16px; color: var(--muted); font-size: 13px; line-height: 1.5; }
+    .crop-canvas-wrap {
+      position: relative;
+      margin-top: 16px;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #080d14;
+    }
+    .crop-canvas { display: block; width: 100%; height: auto; cursor: grab; touch-action: none; }
+    .crop-canvas.is-dragging { cursor: grabbing; }
+    .crop-canvas:focus-visible { outline: 3px solid var(--accent); outline-offset: -3px; }
+    .crop-zoom { width: 100%; accent-color: var(--accent); }
+    .precision-controls { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px; align-items: end; margin-top: 12px; }
+    .zoom-control { display: grid; grid-template-columns: 1fr 82px; gap: 8px; align-items: end; }
+    .zoom-control label:first-child { grid-column: 1 / -1; color: var(--muted); font-size: 13px; }
+    .zoom-control input[type="range"] { width: 100%; accent-color: var(--accent); }
+    .number-compact {
+      width: 82px;
+      min-height: 38px;
+      padding: 0 8px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      color: var(--ink);
+      background: var(--field);
+    }
+    .nudge-pad { display: grid; grid-template-columns: repeat(3, 38px); grid-template-rows: repeat(3, 34px); gap: 4px; }
+    .nudge-pad button { min-height: 34px; padding: 0; }
+    .nudge-up { grid-column: 2; }
+    .nudge-left { grid-column: 1; grid-row: 2; }
+    .nudge-center { grid-column: 2; grid-row: 2; color: var(--muted); cursor: default; }
+    .nudge-right { grid-column: 3; grid-row: 2; }
+    .nudge-down { grid-column: 2; grid-row: 3; }
+    .position-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
+    .position-field { display: grid; grid-template-columns: auto 1fr; align-items: center; gap: 7px; color: var(--muted); font-size: 12px; }
+    .position-field input { width: 100%; }
+    .zoom-stepper { display: grid; grid-template-columns: 38px 1fr 38px; gap: 6px; align-items: center; }
+    .zoom-stepper .crop-zoom { min-width: 0; }
+    .zoom-stepper button { min-height: 36px; padding: 0; }
+    .align-row { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+    .align-row button { min-height: 32px; padding: 0 9px; font-size: 12px; }
+    .dialog-actions { display: flex; justify-content: flex-end; gap: 10px; }
+    .primary {
+      min-height: 42px;
+      padding: 0 16px;
+      border: 0;
+      border-radius: 8px;
+      background: var(--accent-strong);
+      color: white;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .mark {
+      position: absolute;
+      border: 1px solid rgba(245, 247, 251, .95);
+      background: var(--mark);
+      box-shadow: 0 0 0 1px rgba(0, 0, 0, .75), 0 0 0 9999px rgba(96, 165, 250, .014);
+    }
+
+    .side {
+      padding: 22px;
+      background: linear-gradient(180deg, rgba(17, 20, 39, .96), rgba(10, 12, 25, .98));
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 0 0 22px;
+    }
+
+    .brand-icon {
+      width: 44px;
+      height: 44px;
+      display: grid;
+      place-items: center;
+      border: 1px solid rgba(180, 169, 255, .5);
+      border-radius: 14px;
+      background: linear-gradient(135deg, #937bff, #4d71ff);
+      box-shadow: 0 8px 24px rgba(89, 75, 236, .36);
+      color: white;
+      font-weight: 900;
+      font-size: 18px;
+    }
+
+    .brand h1 {
+      margin: 0;
+      font-size: 21px;
+      line-height: 1.2;
+      letter-spacing: 0;
+    }
+
+    .brand p {
+      margin: 3px 0 0;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .preview {
+      height: 76px;
+      border-radius: 12px;
+      border: 1px solid var(--line);
+      background: linear-gradient(135deg, rgba(34, 40, 74, .9), rgba(18, 22, 43, .9));
+      margin-bottom: 14px;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 14px;
+    }
+
+    .preview-color {
+      width: 48px;
+      height: 48px;
+      flex: 0 0 auto;
+      border-radius: 10px;
+      border: 1px solid rgba(245, 247, 251, .2);
+      background: transparent;
+    }
+
+    .preview-label {
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.35;
+    }
+
+    .hex-row {
+      display: grid;
+      grid-template-columns: 1fr 46px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--field);
+      overflow: hidden;
+      margin-bottom: 12px;
+    }
+
+    .hex {
+      min-width: 0;
+      padding: 15px 16px;
+      font-size: 28px;
+      font-weight: 800;
+      letter-spacing: 0;
+      font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+    }
+
+    .copy-state {
+      display: grid;
+      place-items: center;
+      border-left: 1px solid var(--line);
+      color: var(--muted);
+      font-weight: 800;
+    }
+
+    .meta {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+
+    .pill {
+      padding: 10px 12px;
+      border-radius: 10px;
+      background: var(--soft);
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .pill strong {
+      display: block;
+      margin-top: 3px;
+      color: var(--ink);
+      font-size: 15px;
+      font-weight: 700;
+      font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+    }
+
+    .history-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin: 22px 0 10px;
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .chip {
+      display: inline-grid;
+      grid-template-columns: 22px auto;
+      align-items: center;
+      gap: 8px;
+      min-height: 34px;
+      padding: 6px 9px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--field);
+      cursor: pointer;
+      color: var(--ink);
+      font-size: 13px;
+      font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+    }
+
+    .swatch {
+      width: 22px;
+      height: 22px;
+      border-radius: 5px;
+      border: 1px solid rgba(245, 247, 251, .22);
+    }
+
+    .hint {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.55;
+    }
+
+    @media (max-width: 840px) {
+      .app {
+        grid-template-columns: 1fr;
+      }
+
+      .stage {
+        border-right: 0;
+      }
+
+      .side {
+        border-top: 1px solid var(--line);
+      }
+
+      .empty {
+        max-width: calc(100vw - 46px);
+      }
+
+      .top-brand {
+        width: 100%;
+        margin-right: 0;
+        padding: 0 0 12px;
+        border-right: 0;
+        border-bottom: 1px solid var(--line);
+      }
+      .pixelify-layout { grid-template-columns: 1fr; }
+      .pixel-preview-wrap { min-height: 210px; }
+      .adjustment-grid { grid-template-columns: 1fr 1fr; }
+      .precision-controls { grid-template-columns: 1fr; }
+      .nudge-pad { justify-self: center; }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <section class="stage">
+      <div class="toolbar">
+        <div class="top-brand" aria-label="Chanon Roblox Pixel Studio">
+          <div class="top-brand-badge">CR</div>
+          <div class="top-brand-name">Chanon Roblox สุดหล่อ<span>Pixel Studio</span></div>
+        </div>
+        <label class="file">
+          อัปโหลดรูป
+          <input id="fileInput" type="file" accept="image/*">
+        </label>
+        <label class="control">
+          ซูม
+          <input id="zoomInput" type="range" min="1" max="30" value="12">
+          <span id="zoomText">12x</span>
+        </label>
+        <label class="control">
+          มาร์ค
+          <input id="markSizeInput" type="range" min="1" max="24" value="1">
+          <span id="markSizeText">1x</span>
+        </label>
+        <label class="control">
+          ตาราง
+          <input id="gridSizeInput" type="range" min="1" max="50" value="10">
+          <span id="gridSizeText">10x10</span>
+        </label>
+        <label class="size-box">
+          ตาราง
+          <input id="widthInput" type="number" min="1" max="2000" value="50" aria-label="ความกว้างพิกเซล">
+          x
+          <input id="heightInput" type="number" min="1" max="2000" value="30" aria-label="ความสูงพิกเซล">
+          px
+        </label>
+        <button id="resizeImage" class="ghost" type="button" disabled>ปรับให้เข้าตาราง</button>
+        <button id="naturalSize" class="ghost" type="button" disabled>ขนาดจริง</button>
+        <button id="exportPlan" class="ghost" type="button" disabled>ดาวน์โหลดแผนออโต้</button>
+        <button id="clearMarks" class="ghost" type="button" disabled>ล้างจุด</button>
+      </div>
+
+      <div class="workspace">
+        <div id="imageWrap" class="image-wrap">
+          <div id="empty" class="empty">เลือกไฟล์รูปภาพ แล้วคลิกบนรูปเพื่อ copy ค่า HEX ของพิกเซลนั้นทันที</div>
+          <canvas id="displayCanvas" class="image-canvas"></canvas>
+          <div id="grid" class="grid"></div>
+          <div id="marks" class="marks"></div>
+        </div>
+      </div>
+    </section>
+
+    <aside class="side">
+      <div class="brand">
+        <div class="brand-icon">CR</div>
+        <div>
+          <h1>Chanon Roblox สุดหล่อ</h1>
+          <p>Pixel Studio · Color Picker</p>
+        </div>
+      </div>
+      <div class="preview">
+        <div id="previewColor" class="preview-color"></div>
+        <div class="preview-label">สีปัจจุบัน</div>
+      </div>
+      <div class="hex-row">
+        <div id="hexValue" class="hex">#------</div>
+        <div id="copyState" class="copy-state">-</div>
+      </div>
+      <div class="meta">
+        <div class="pill">ตำแหน่ง<strong id="posValue">x -, y -</strong></div>
+        <div class="pill">สถานะ<strong id="countValue">-</strong></div>
+      </div>
+      <p class="hint">คลิกบนรูปเพื่อเลือกสี ระบบจะคัดลอกค่า HEX ให้อัตโนมัติ เหมาะสำหรับทำงาน Pixel Art และ Roblox</p>
+      <div class="history-title">
+        <span>สีปัจจุบัน</span>
+        <span>คลิกซ้ำเพื่อ copy</span>
+      </div>
+      <div id="history" class="chips"></div>
+    </aside>
+  </main>
+
+  <dialog id="resizeDialog" class="resize-dialog">
+    <form id="resizeForm" method="dialog" class="dialog-content">
+      <h2>ตั้งค่าตารางพิกเซล</h2>
+      <p id="sourceInfo">รูปที่อัปโหลดจะถูกปรับให้มี 1 พิกเซลต่อ 1 ช่องตาราง</p>
+      <div class="dialog-grid">
+        <label class="dialog-field">ความกว้าง (ช่อง / px)<input id="dialogWidth" type="number" min="1" max="2000" value="50" required></label>
+        <label class="dialog-field">ความสูง (ช่อง / px)<input id="dialogHeight" type="number" min="1" max="2000" value="30" required></label>
+        <label class="dialog-field">วิธีแปลงภาพ
+          <select id="pixelMethod">
+            <option value="average">Pixelify เนียน (แนะนำ)</option>
+            <option value="nearest">คมแบบพิกเซลดั้งเดิม</option>
+          </select>
+        </label>
+        <label class="dialog-field">จำนวนสีสูงสุด
+          <select id="paletteSize">
+            <option value="unlimited" selected>ไม่จำกัดสี</option>
+            <option value="128">128 สี</option>
+            <option value="64">64 สี</option>
+            <option value="32">32 สี</option>
+            <option value="16">16 สี</option>
+            <option value="8">8 สี</option>
+          </select>
+        </label>
+      </div>
+      <div class="preset-row" aria-label="ขนาดยอดนิยม">
+        <button class="preset" type="button" data-size="16x16">16×16</button>
+        <button class="preset" type="button" data-size="32x32">32×32</button>
+        <button class="preset" type="button" data-size="50x50">50×50</button>
+        <button class="preset" type="button" data-size="64x64">64×64</button>
+        <button class="preset" type="button" data-size="100x100">100×100</button>
+      </div>
+      <section class="adjustments" aria-label="ปรับสีและแสง">
+        <div class="adjustments-head"><strong>ปรับสีและแสง</strong><button id="resetAdjustments" class="ghost" type="button">คืนค่าเดิม</button></div>
+        <div class="adjustment-grid">
+          <label class="adjustment"><span>ความสว่าง</span><output id="brightnessValue">0</output><input id="brightnessInput" type="range" min="-100" max="100" value="0"></label>
+          <label class="adjustment"><span>ความเข้มสี</span><output id="vibranceValue">0</output><input id="vibranceInput" type="range" min="-100" max="100" value="0"></label>
+          <label class="adjustment"><span>ความอิ่มสี</span><output id="saturationValue">0</output><input id="saturationInput" type="range" min="-100" max="100" value="0"></label>
+          <label class="adjustment"><span>คอนทราสต์</span><output id="contrastValue">0</output><input id="contrastInput" type="range" min="-100" max="100" value="0"></label>
+          <label class="adjustment"><span>เงา</span><output id="shadowsValue">0</output><input id="shadowsInput" type="range" min="-100" max="100" value="0"></label>
+        </div>
+      </section>
+      <div class="pixelify-layout">
+        <div>
+          <div class="crop-canvas-wrap"><canvas id="cropCanvas" class="crop-canvas" width="1400" height="800" tabindex="0" aria-label="พื้นที่เลือกตำแหน่งรูป ใช้ปุ่มลูกศรเพื่อขยับกรอบ"></canvas></div>
+          <p class="crop-help">ลากกรอบ หรือใช้ปุ่มลูกศรเพื่อขยับทีละ 1 px · กด Shift + ลูกศรเพื่อขยับทีละ 10 px · Ctrl + ล้อเมาส์เพื่อซูมละเอียด</p>
+          <div class="precision-controls">
+            <div>
+              <div class="zoom-control">
+                <label for="cropZoom">ซูมพื้นที่ครอป <strong id="cropZoomText">100%</strong></label>
+                <div class="zoom-stepper">
+                  <button id="zoomOutFine" class="ghost" type="button" aria-label="ซูมออก 0.1 เปอร์เซ็นต์">−</button>
+                  <input id="cropZoom" class="crop-zoom" type="range" min="100" max="800" step="0.1" value="100">
+                  <button id="zoomInFine" class="ghost" type="button" aria-label="ซูมเข้า 0.1 เปอร์เซ็นต์">+</button>
+                </div>
+                <input id="cropZoomNumber" class="number-compact" type="number" min="100" max="800" step="0.1" value="100" aria-label="เปอร์เซ็นต์ซูม">
+              </div>
+              <div class="position-row">
+                <label class="position-field">X <input id="cropXInput" class="number-compact" type="number" min="0" step="1" value="0"></label>
+                <label class="position-field">Y <input id="cropYInput" class="number-compact" type="number" min="0" step="1" value="0"></label>
+              </div>
+              <div class="align-row" aria-label="จัดตำแหน่งกรอบ">
+                <button class="ghost" type="button" data-align="left">ชิดซ้าย</button>
+                <button class="ghost" type="button" data-align="center">กึ่งกลาง</button>
+                <button class="ghost" type="button" data-align="right">ชิดขวา</button>
+                <button class="ghost" type="button" data-align="top">ชิดบน</button>
+                <button class="ghost" type="button" data-align="bottom">ชิดล่าง</button>
+              </div>
+            </div>
+            <div class="nudge-pad" aria-label="เลื่อนกรอบอย่างละเอียด">
+              <button class="ghost nudge-up" type="button" data-dx="0" data-dy="-1" aria-label="เลื่อนขึ้น 1 พิกเซล">↑</button>
+              <button class="ghost nudge-left" type="button" data-dx="-1" data-dy="0" aria-label="เลื่อนซ้าย 1 พิกเซล">←</button>
+              <button class="ghost nudge-center" type="button" tabindex="-1" disabled>1px</button>
+              <button class="ghost nudge-right" type="button" data-dx="1" data-dy="0" aria-label="เลื่อนขวา 1 พิกเซล">→</button>
+              <button class="ghost nudge-down" type="button" data-dx="0" data-dy="1" aria-label="เลื่อนลง 1 พิกเซล">↓</button>
+            </div>
+          </div>
+        </div>
+        <section class="pixel-preview-panel" aria-label="ตัวอย่าง Pixel Art">
+          <div class="pixel-preview-head"><strong>ตัวอย่างแบบเรียลไทม์</strong><span id="previewSize">50×30</span></div>
+          <div class="pixel-preview-wrap"><canvas id="pixelPreviewCanvas" class="pixel-preview-canvas"></canvas></div>
+          <div id="snapState" class="snap-state">กำลังคำนวณการล็อกช่อง…</div>
+        </section>
+      </div>
+      <div id="resizeSummary" class="resize-summary"></div>
+      <div class="dialog-actions">
+        <button id="cancelResize" class="ghost" type="button">ยกเลิก</button>
+        <button class="primary" type="submit">ตกลง ใช้รูปนี้</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script>
+    const fileInput = document.getElementById('fileInput');
+    const zoomInput = document.getElementById('zoomInput');
+    const zoomText = document.getElementById('zoomText');
+    const markSizeInput = document.getElementById('markSizeInput');
+    const markSizeText = document.getElementById('markSizeText');
+    const gridSizeInput = document.getElementById('gridSizeInput');
+    const gridSizeText = document.getElementById('gridSizeText');
+    const widthInput = document.getElementById('widthInput');
+    const heightInput = document.getElementById('heightInput');
+    const resizeImage = document.getElementById('resizeImage');
+    const naturalSize = document.getElementById('naturalSize');
+    const exportPlan = document.getElementById('exportPlan');
+    const clearMarks = document.getElementById('clearMarks');
+    const imageWrap = document.getElementById('imageWrap');
+    const empty = document.getElementById('empty');
+    const canvas = document.getElementById('displayCanvas');
+    const ctx = canvas.getContext('2d', { willReadFrequently: true });
+    const grid = document.getElementById('grid');
+    const marks = document.getElementById('marks');
+    const previewColor = document.getElementById('previewColor');
+    const hexValue = document.getElementById('hexValue');
+    const copyState = document.getElementById('copyState');
+    const posValue = document.getElementById('posValue');
+    const countValue = document.getElementById('countValue');
+    const history = document.getElementById('history');
+    const resizeDialog = document.getElementById('resizeDialog');
+    const resizeForm = document.getElementById('resizeForm');
+    const dialogWidth = document.getElementById('dialogWidth');
+    const dialogHeight = document.getElementById('dialogHeight');
+    const sourceInfo = document.getElementById('sourceInfo');
+    const resizeSummary = document.getElementById('resizeSummary');
+    const cancelResize = document.getElementById('cancelResize');
+    const cropCanvas = document.getElementById('cropCanvas');
+    const cropCtx = cropCanvas.getContext('2d');
+    const cropZoomInput = document.getElementById('cropZoom');
+    const cropZoomNumber = document.getElementById('cropZoomNumber');
+    const cropZoomText = document.getElementById('cropZoomText');
+    const cropXInput = document.getElementById('cropXInput');
+    const cropYInput = document.getElementById('cropYInput');
+    const nudgeButtons = [...document.querySelectorAll('.nudge-pad button[data-dx]')];
+    const zoomOutFine = document.getElementById('zoomOutFine');
+    const zoomInFine = document.getElementById('zoomInFine');
+    const alignButtons = [...document.querySelectorAll('[data-align]')];
+    const pixelMethod = document.getElementById('pixelMethod');
+    const paletteSize = document.getElementById('paletteSize');
+    const pixelPreviewCanvas = document.getElementById('pixelPreviewCanvas');
+    const pixelPreviewCtx = pixelPreviewCanvas.getContext('2d', { willReadFrequently: true });
+    const previewSize = document.getElementById('previewSize');
+    const snapState = document.getElementById('snapState');
+    const presetButtons = [...document.querySelectorAll('.preset')];
+    const adjustmentInputs = {
+      brightness: document.getElementById('brightnessInput'),
+      vibrance: document.getElementById('vibranceInput'),
+      saturation: document.getElementById('saturationInput'),
+      contrast: document.getElementById('contrastInput'),
+      shadows: document.getElementById('shadowsInput')
+    };
+    const adjustmentOutputs = {
+      brightness: document.getElementById('brightnessValue'),
+      vibrance: document.getElementById('vibranceValue'),
+      saturation: document.getElementById('saturationValue'),
+      contrast: document.getElementById('contrastValue'),
+      shadows: document.getElementById('shadowsValue')
+    };
+    const resetAdjustments = document.getElementById('resetAdjustments');
+
+    let imageReady = false;
+    let sourceImage = null;
+    let pendingImage = null;
+    let cropSelection = null;
+    let committedCrop = null;
+    let cropDrag = null;
+    let zoom = Number(zoomInput.value);
+    let markSize = Number(markSizeInput.value);
+    let gridSize = Number(gridSizeInput.value);
+    let latestCopyTimer = 0;
+    let previewFrame = 0;
+    let cropPointer = null;
+
+    function componentToHex(value) {
+      return value.toString(16).padStart(2, '0').toUpperCase();
+    }
+
+    function rgbToHex(r, g, b) {
+      return `#${componentToHex(r)}${componentToHex(g)}${componentToHex(b)}`;
+    }
+
+    async function copyHex(hex) {
+      try {
+        await navigator.clipboard.writeText(hex);
+        setCopyState('✓');
+      } catch {
+        fallbackCopy(hex);
+      }
+    }
+
+    function fallbackCopy(hex) {
+      const input = document.createElement('input');
+      input.value = hex;
+      input.style.position = 'fixed';
+      input.style.opacity = '0';
+      document.body.appendChild(input);
+      input.select();
+      document.execCommand('copy');
+      input.remove();
+      setCopyState('✓');
+    }
+
+    function setCopyState(text) {
+      copyState.textContent = text;
+      window.clearTimeout(latestCopyTimer);
+      latestCopyTimer = window.setTimeout(() => {
+        copyState.textContent = '-';
+      }, 900);
+    }
+
+    function applyZoom() {
+      zoom = Number(zoomInput.value);
+      zoomText.textContent = `${zoom}x`;
+      canvas.style.width = `${canvas.width * zoom}px`;
+      canvas.style.height = `${canvas.height * zoom}px`;
+      imageWrap.style.width = imageReady ? `${canvas.width * zoom}px` : '';
+      imageWrap.style.height = imageReady ? `${canvas.height * zoom}px` : '';
+      marks.style.width = `${canvas.width * zoom}px`;
+      marks.style.height = `${canvas.height * zoom}px`;
+      grid.style.width = `${canvas.width * zoom}px`;
+      grid.style.height = `${canvas.height * zoom}px`;
+      applyGrid();
+
+      for (const mark of marks.children) {
+        positionMark(mark);
+      }
+    }
+
+    function applyMarkSize() {
+      markSize = Number(markSizeInput.value);
+      markSizeText.textContent = `${markSize}x`;
+
+      for (const mark of marks.children) {
+        positionMark(mark);
+      }
+    }
+
+    function applyGrid() {
+      gridSize = Number(gridSizeInput.value);
+      gridSizeText.textContent = `${gridSize}x${gridSize}`;
+      const step = Math.max(1, gridSize * zoom);
+      grid.style.backgroundImage = [
+        'linear-gradient(to right, rgba(255,255,255,.86) 1px, transparent 1px)',
+        'linear-gradient(to bottom, rgba(255,255,255,.86) 1px, transparent 1px)'
+      ].join(',');
+      grid.style.backgroundSize = `${step}px ${step}px`;
+    }
+
+    function positionMark(mark) {
+      const x = Number(mark.dataset.x);
+      const y = Number(mark.dataset.y);
+      const size = Math.max(zoom, zoom * markSize);
+      const centerOffset = (size - zoom) / 2;
+
+      mark.style.left = `${(x * zoom) - centerOffset}px`;
+      mark.style.top = `${(y * zoom) - centerOffset}px`;
+      mark.style.width = `${size}px`;
+      mark.style.height = `${size}px`;
+    }
+
+    function resetPickedState() {
+      marks.innerHTML = '';
+      history.innerHTML = '';
+      countValue.textContent = '-';
+      clearMarks.disabled = true;
+      hexValue.textContent = '#------';
+      posValue.textContent = 'x -, y -';
+      previewColor.style.background = 'transparent';
+    }
+
+    function quantizeCanvas(targetCtx, width, height, colors) {
+      const imageData = targetCtx.getImageData(0, 0, width, height);
+      const data = imageData.data;
+      const levels = Math.max(2, Math.round(Math.cbrt(colors)));
+      const step = 255 / (levels - 1);
+      for (let index = 0; index < data.length; index += 4) {
+        data[index] = Math.round(data[index] / step) * step;
+        data[index + 1] = Math.round(data[index + 1] / step) * step;
+        data[index + 2] = Math.round(data[index + 2] / step) * step;
+      }
+      targetCtx.putImageData(imageData, 0, 0);
+    }
+
+    function clampChannel(value) {
+      return Math.max(0, Math.min(255, Math.round(value)));
+    }
+
+    function adjustCanvasColors(targetCtx, width, height) {
+      const settings = Object.fromEntries(Object.entries(adjustmentInputs).map(([key, input]) => [key, Number(input.value)]));
+      if (Object.values(settings).every((value) => value === 0)) return;
+      const imageData = targetCtx.getImageData(0, 0, width, height);
+      const data = imageData.data;
+      const brightness = settings.brightness * 2.55;
+      const contrastValue = settings.contrast * 2.55;
+      const contrast = (259 * (contrastValue + 255)) / (255 * (259 - contrastValue));
+      const saturation = 1 + settings.saturation / 100;
+      const shadows = settings.shadows * 2.2;
+      for (let index = 0; index < data.length; index += 4) {
+        let r = data[index];
+        let g = data[index + 1];
+        let b = data[index + 2];
+        const originalLuma = .2126 * r + .7152 * g + .0722 * b;
+        const shadowWeight = 1 - originalLuma / 255;
+        r = contrast * (r - 128) + 128 + brightness + shadows * shadowWeight;
+        g = contrast * (g - 128) + 128 + brightness + shadows * shadowWeight;
+        b = contrast * (b - 128) + 128 + brightness + shadows * shadowWeight;
+        const luma = .2126 * r + .7152 * g + .0722 * b;
+        r = luma + (r - luma) * saturation;
+        g = luma + (g - luma) * saturation;
+        b = luma + (b - luma) * saturation;
+        const maxColor = Math.max(r, g, b);
+        const minColor = Math.min(r, g, b);
+        const colorfulness = (maxColor - minColor) / 255;
+        const vibrance = settings.vibrance >= 0
+          ? 1 + (settings.vibrance / 100) * (1 - colorfulness)
+          : 1 + settings.vibrance / 100;
+        const average = (r + g + b) / 3;
+        data[index] = clampChannel(average + (r - average) * vibrance);
+        data[index + 1] = clampChannel(average + (g - average) * vibrance);
+        data[index + 2] = clampChannel(average + (b - average) * vibrance);
+      }
+      targetCtx.putImageData(imageData, 0, 0);
+    }
+
+    function renderPixelated(targetCtx, image, crop, width, height) {
+      targetCtx.clearRect(0, 0, width, height);
+      targetCtx.imageSmoothingEnabled = pixelMethod.value !== 'nearest';
+      targetCtx.imageSmoothingQuality = 'high';
+      targetCtx.drawImage(image, crop.x, crop.y, crop.width, crop.height, 0, 0, width, height);
+      adjustCanvasColors(targetCtx, width, height);
+      if (paletteSize.value !== 'unlimited') {
+        quantizeCanvas(targetCtx, width, height, Number(paletteSize.value));
+      }
+    }
+
+    function drawSourceToCanvas(width, height) {
+      if (!sourceImage) return;
+
+      canvas.width = width;
+      canvas.height = height;
+      const crop = committedCrop || {
+        x: 0, y: 0, width: sourceImage.naturalWidth, height: sourceImage.naturalHeight
+      };
+      renderPixelated(ctx, sourceImage, crop, width, height);
+
+      widthInput.value = String(width);
+      heightInput.value = String(height);
+      resetPickedState();
+      exportPlan.disabled = false;
+      applyZoom();
+    }
+
+    function getRequestedSize() {
+      const width = Math.max(1, Math.min(2000, Math.floor(Number(widthInput.value) || 1)));
+      const height = Math.max(1, Math.min(2000, Math.floor(Number(heightInput.value) || 1)));
+      return { width, height };
+    }
+
+    function getDialogSize() {
+      const width = Math.max(1, Math.min(2000, Math.floor(Number(dialogWidth.value) || 1)));
+      const height = Math.max(1, Math.min(2000, Math.floor(Number(dialogHeight.value) || 1)));
+      return { width, height };
+    }
+
+    function clamp(value, min, max) {
+      return Math.max(min, Math.min(max, value));
+    }
+
+    function snapCropPosition(value, cropLength, imageLength, step) {
+      const safeStep = Math.max(1, step || 1);
+      const maxPosition = Math.max(0, Math.floor((imageLength - cropLength) / safeStep) * safeStep);
+      return clamp(Math.round(value / safeStep) * safeStep, 0, maxPosition);
+    }
+
+    function resetCropSelection() {
+      if (!pendingImage) return;
+      const { width, height } = getDialogSize();
+      const aspect = width / height;
+      let cropWidth = pendingImage.naturalWidth;
+      let cropHeight = cropWidth / aspect;
+      if (cropHeight > pendingImage.naturalHeight) {
+        cropHeight = pendingImage.naturalHeight;
+        cropWidth = cropHeight * aspect;
+      }
+      cropSelection = {
+        x: snapCropPosition((pendingImage.naturalWidth - cropWidth) / 2, cropWidth, pendingImage.naturalWidth, 1),
+        y: snapCropPosition((pendingImage.naturalHeight - cropHeight) / 2, cropHeight, pendingImage.naturalHeight, 1),
+        baseWidth: cropWidth,
+        baseHeight: cropHeight,
+        block: cropWidth / width,
+        width: cropWidth,
+        height: cropHeight
+      };
+      cropZoomInput.value = '100';
+      cropZoomNumber.value = '100';
+      drawCropCanvas();
+      updateResizeSummary();
+    }
+
+    function getCropDisplay() {
+      const scale = Math.min(cropCanvas.width / pendingImage.naturalWidth, cropCanvas.height / pendingImage.naturalHeight);
+      const width = pendingImage.naturalWidth * scale;
+      const height = pendingImage.naturalHeight * scale;
+      return { scale, x: (cropCanvas.width - width) / 2, y: (cropCanvas.height - height) / 2, width, height };
+    }
+
+    function drawCropCanvas() {
+      if (!pendingImage || !cropSelection) return;
+      const display = getCropDisplay();
+      cropCtx.fillStyle = '#080d14';
+      cropCtx.fillRect(0, 0, cropCanvas.width, cropCanvas.height);
+      cropCtx.drawImage(pendingImage, display.x, display.y, display.width, display.height);
+      const rect = {
+        x: display.x + cropSelection.x * display.scale,
+        y: display.y + cropSelection.y * display.scale,
+        width: cropSelection.width * display.scale,
+        height: cropSelection.height * display.scale
+      };
+      cropCtx.fillStyle = 'rgba(0, 0, 0, .58)';
+      cropCtx.fillRect(0, 0, cropCanvas.width, rect.y);
+      cropCtx.fillRect(0, rect.y + rect.height, cropCanvas.width, cropCanvas.height - rect.y - rect.height);
+      cropCtx.fillRect(0, rect.y, rect.x, rect.height);
+      cropCtx.fillRect(rect.x + rect.width, rect.y, cropCanvas.width - rect.x - rect.width, rect.height);
+      cropCtx.strokeStyle = '#f5f7fb';
+      cropCtx.lineWidth = 2;
+      cropCtx.strokeRect(rect.x, rect.y, rect.width, rect.height);
+      const { width: targetWidth, height: targetHeight } = getDialogSize();
+      const cellWidth = rect.width / targetWidth;
+      const cellHeight = rect.height / targetHeight;
+      cropCtx.save();
+      cropCtx.beginPath();
+      cropCtx.rect(rect.x, rect.y, rect.width, rect.height);
+      cropCtx.clip();
+      cropCtx.strokeStyle = 'rgba(245, 247, 251, .26)';
+      cropCtx.lineWidth = .5;
+      cropCtx.beginPath();
+      for (let column = 1; column < targetWidth; column += 1) {
+        const x = rect.x + column * cellWidth;
+        cropCtx.moveTo(x, rect.y);
+        cropCtx.lineTo(x, rect.y + rect.height);
+      }
+      for (let row = 1; row < targetHeight; row += 1) {
+        const y = rect.y + row * cellHeight;
+        cropCtx.moveTo(rect.x, y);
+        cropCtx.lineTo(rect.x + rect.width, y);
+      }
+      cropCtx.stroke();
+      cropCtx.restore();
+      cropCtx.save();
+      cropCtx.setLineDash([9, 7]);
+      cropCtx.lineWidth = 1;
+      cropCtx.strokeStyle = 'rgba(139, 124, 255, .95)';
+      cropCtx.beginPath();
+      cropCtx.moveTo(rect.x + rect.width / 2, rect.y);
+      cropCtx.lineTo(rect.x + rect.width / 2, rect.y + rect.height);
+      cropCtx.moveTo(rect.x, rect.y + rect.height / 2);
+      cropCtx.lineTo(rect.x + rect.width, rect.y + rect.height / 2);
+      cropCtx.stroke();
+      cropCtx.restore();
+      drawCropMagnifier(display);
+      syncCropControls();
+      schedulePixelPreview();
+    }
+
+    function drawCropMagnifier(display) {
+      if (!cropPointer || !pendingImage) return;
+      const diameter = 170;
+      const radius = diameter / 2;
+      let centerX = cropPointer.canvasX + 105;
+      let centerY = cropPointer.canvasY - 105;
+      if (centerX + radius > cropCanvas.width) centerX = cropPointer.canvasX - 105;
+      if (centerY - radius < 0) centerY = cropPointer.canvasY + 105;
+      const sourceX = clamp(cropPointer.sourceX, 0, pendingImage.naturalWidth);
+      const sourceY = clamp(cropPointer.sourceY, 0, pendingImage.naturalHeight);
+      const sampleSize = 22;
+      cropCtx.save();
+      cropCtx.beginPath();
+      cropCtx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+      cropCtx.clip();
+      cropCtx.fillStyle = '#080d14';
+      cropCtx.fillRect(centerX - radius, centerY - radius, diameter, diameter);
+      cropCtx.imageSmoothingEnabled = false;
+      cropCtx.drawImage(
+        pendingImage,
+        clamp(sourceX - sampleSize / 2, 0, Math.max(0, pendingImage.naturalWidth - sampleSize)),
+        clamp(sourceY - sampleSize / 2, 0, Math.max(0, pendingImage.naturalHeight - sampleSize)),
+        Math.min(sampleSize, pendingImage.naturalWidth), Math.min(sampleSize, pendingImage.naturalHeight),
+        centerX - radius, centerY - radius, diameter, diameter
+      );
+      const cell = diameter / sampleSize;
+      cropCtx.strokeStyle = 'rgba(255,255,255,.28)';
+      cropCtx.lineWidth = 1;
+      for (let index = 1; index < sampleSize; index += 1) {
+        const offset = index * cell;
+        cropCtx.beginPath();
+        cropCtx.moveTo(centerX - radius + offset, centerY - radius);
+        cropCtx.lineTo(centerX - radius + offset, centerY + radius);
+        cropCtx.moveTo(centerX - radius, centerY - radius + offset);
+        cropCtx.lineTo(centerX + radius, centerY - radius + offset);
+        cropCtx.stroke();
+      }
+      cropCtx.restore();
+      cropCtx.strokeStyle = '#ffffff';
+      cropCtx.lineWidth = 3;
+      cropCtx.beginPath();
+      cropCtx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+      cropCtx.stroke();
+      cropCtx.strokeStyle = '#8b7cff';
+      cropCtx.lineWidth = 2;
+      cropCtx.strokeRect(centerX - cell / 2, centerY - cell / 2, cell, cell);
+    }
+
+    function applyCropZoom(requestedZoom = Number(cropZoomInput.value)) {
+      if (!cropSelection || !pendingImage) return;
+      const centerX = cropSelection.x + cropSelection.width / 2;
+      const centerY = cropSelection.y + cropSelection.height / 2;
+      const { width, height } = getDialogSize();
+      const zoomPercent = clamp(Math.round((Number(requestedZoom) || 100) * 10) / 10, 100, 800);
+      cropZoomInput.value = zoomPercent.toFixed(1);
+      cropZoomNumber.value = zoomPercent.toFixed(1);
+      const zoomFactor = zoomPercent / 100;
+      cropSelection.width = cropSelection.baseWidth / zoomFactor;
+      cropSelection.height = cropSelection.baseHeight / zoomFactor;
+      cropSelection.block = cropSelection.width / width;
+      cropSelection.x = snapCropPosition(centerX - cropSelection.width / 2, cropSelection.width, pendingImage.naturalWidth, 1);
+      cropSelection.y = snapCropPosition(centerY - cropSelection.height / 2, cropSelection.height, pendingImage.naturalHeight, 1);
+      drawCropCanvas();
+      updateResizeSummary();
+    }
+
+    function syncCropControls() {
+      if (!cropSelection || !pendingImage) return;
+      cropZoomText.textContent = `${Number(cropZoomInput.value).toFixed(1)}%`;
+      cropXInput.value = String(Math.round(cropSelection.x));
+      cropYInput.value = String(Math.round(cropSelection.y));
+      cropXInput.max = String(Math.max(0, Math.floor(pendingImage.naturalWidth - cropSelection.width)));
+      cropYInput.max = String(Math.max(0, Math.floor(pendingImage.naturalHeight - cropSelection.height)));
+    }
+
+    function moveCrop(dx, dy) {
+      if (!cropSelection || !pendingImage) return;
+      cropSelection.x = snapCropPosition(cropSelection.x + dx, cropSelection.width, pendingImage.naturalWidth, 1);
+      cropSelection.y = snapCropPosition(cropSelection.y + dy, cropSelection.height, pendingImage.naturalHeight, 1);
+      drawCropCanvas();
+      updateResizeSummary();
+    }
+
+    function setCropPosition(axis, rawValue) {
+      if (!cropSelection || !pendingImage) return;
+      if (axis === 'x') cropSelection.x = snapCropPosition(Number(rawValue) || 0, cropSelection.width, pendingImage.naturalWidth, 1);
+      if (axis === 'y') cropSelection.y = snapCropPosition(Number(rawValue) || 0, cropSelection.height, pendingImage.naturalHeight, 1);
+      drawCropCanvas();
+      updateResizeSummary();
+    }
+
+    function alignCrop(position) {
+      if (!cropSelection || !pendingImage) return;
+      const maxX = Math.max(0, Math.floor(pendingImage.naturalWidth - cropSelection.width));
+      const maxY = Math.max(0, Math.floor(pendingImage.naturalHeight - cropSelection.height));
+      if (position === 'left') cropSelection.x = 0;
+      if (position === 'right') cropSelection.x = maxX;
+      if (position === 'top') cropSelection.y = 0;
+      if (position === 'bottom') cropSelection.y = maxY;
+      if (position === 'center') {
+        cropSelection.x = Math.round(maxX / 2);
+        cropSelection.y = Math.round(maxY / 2);
+      }
+      drawCropCanvas();
+      updateResizeSummary();
+    }
+
+    function schedulePixelPreview() {
+      window.cancelAnimationFrame(previewFrame);
+      previewFrame = window.requestAnimationFrame(drawPixelPreview);
+    }
+
+    function drawPixelPreview() {
+      if (!pendingImage || !cropSelection) return;
+      const { width, height } = getDialogSize();
+      pixelPreviewCanvas.width = width;
+      pixelPreviewCanvas.height = height;
+      renderPixelated(pixelPreviewCtx, pendingImage, cropSelection, width, height);
+      const scale = Math.min(12, 320 / width, 420 / height);
+      pixelPreviewCanvas.style.width = `${Math.max(1, width * scale)}px`;
+      pixelPreviewCanvas.style.height = 'auto';
+      pixelPreviewCanvas.style.aspectRatio = `${width} / ${height}`;
+      const divisor = greatestCommonDivisor(width, height);
+      previewSize.textContent = `${width}×${height} px · สัดส่วน ${width / divisor}:${height / divisor}`;
+      const sourcePerCellX = cropSelection.width / width;
+      const sourcePerCellY = cropSelection.height / height;
+      snapState.textContent = `ตำแหน่ง X ${Math.round(cropSelection.x)}, Y ${Math.round(cropSelection.y)} · 1 ช่องผลลัพธ์อ่านพื้นที่ต้นฉบับ ${sourcePerCellX.toFixed(2)}×${sourcePerCellY.toFixed(2)} px · กรอบ Snap ทีละ 1 px`;
+    }
+
+    function greatestCommonDivisor(a, b) {
+      let x = Math.abs(a);
+      let y = Math.abs(b);
+      while (y) [x, y] = [y, x % y];
+      return x || 1;
+    }
+
+    function updateAdjustment(key) {
+      const value = Number(adjustmentInputs[key].value);
+      adjustmentOutputs[key].value = value > 0 ? `+${value}` : String(value);
+      schedulePixelPreview();
+    }
+
+    function updateResizeSummary() {
+      if (!pendingImage) return;
+      const { width, height } = getDialogSize();
+      const widthAction = width === pendingImage.naturalWidth ? 'คงความกว้างเดิม' : width < pendingImage.naturalWidth ? 'ย่อความกว้าง' : 'ขยายความกว้าง';
+      const heightAction = height === pendingImage.naturalHeight ? 'คงความสูงเดิม' : height < pendingImage.naturalHeight ? 'ย่อความสูง' : 'ขยายความสูง';
+      const blockText = cropSelection ? ` · พื้นที่ต้นฉบับต่อช่อง ${cropSelection.block.toFixed(2)}×${cropSelection.block.toFixed(2)} px` : '';
+      resizeSummary.textContent = `ผลลัพธ์: ตาราง ${width} × ${height} ช่อง (${widthAction}, ${heightAction}) — 1 ช่อง = 1 พิกเซล${blockText}`;
+    }
+
+    function openResizeDialog() {
+      dialogWidth.value = widthInput.value;
+      dialogHeight.value = heightInput.value;
+      sourceInfo.textContent = `ขนาดรูปต้นฉบับ ${pendingImage.naturalWidth} × ${pendingImage.naturalHeight} px เลือกขนาดตารางที่ต้องการ แล้วรูปจะถูกย่อหรือขยายให้พอดีทุกช่อง`;
+      updateResizeSummary();
+      resetCropSelection();
+      resizeDialog.showModal();
+    }
+
+    function addMark(x, y, hex) {
+      marks.innerHTML = '';
+      const mark = document.createElement('div');
+      mark.className = 'mark';
+      mark.dataset.x = x;
+      mark.dataset.y = y;
+      mark.title = `${hex} (${x}, ${y})`;
+      mark.style.background = 'var(--mark)';
+      marks.appendChild(mark);
+      positionMark(mark);
+      countValue.textContent = 'เลือกแล้ว';
+      clearMarks.disabled = false;
+    }
+
+    function addHistory(hex) {
+      history.innerHTML = '';
+      const chip = document.createElement('button');
+      chip.className = 'chip';
+      chip.type = 'button';
+      chip.innerHTML = `<span class="swatch" style="background:${hex}"></span><span>${hex}</span>`;
+      chip.addEventListener('click', () => copyHex(hex));
+      history.prepend(chip);
+    }
+
+    function pickPixel(event) {
+      if (!imageReady) return;
+
+      const rect = canvas.getBoundingClientRect();
+      const x = Math.floor((event.clientX - rect.left) / zoom);
+      const y = Math.floor((event.clientY - rect.top) / zoom);
+
+      if (x < 0 || y < 0 || x >= canvas.width || y >= canvas.height) return;
+
+      const [r, g, b] = ctx.getImageData(x, y, 1, 1).data;
+      const hex = rgbToHex(r, g, b);
+      hexValue.textContent = hex;
+      previewColor.style.background = hex;
+      posValue.textContent = `x ${x}, y ${y}`;
+      addMark(x, y, hex);
+      addHistory(hex);
+      copyHex(hex);
+    }
+
+    function loadImage(file) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        const image = new Image();
+        image.onload = () => {
+          pendingImage = image;
+          openResizeDialog();
+        };
+        image.src = reader.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    fileInput.addEventListener('change', () => {
+      const file = fileInput.files && fileInput.files[0];
+      if (file) loadImage(file);
+    });
+
+    zoomInput.addEventListener('input', applyZoom);
+    markSizeInput.addEventListener('input', applyMarkSize);
+    gridSizeInput.addEventListener('input', applyGrid);
+    canvas.addEventListener('click', pickPixel);
+
+    resizeImage.addEventListener('click', () => {
+      const requested = getRequestedSize();
+      drawSourceToCanvas(requested.width, requested.height);
+    });
+
+    naturalSize.addEventListener('click', () => {
+      if (!sourceImage) return;
+      const crop = committedCrop || sourceImage;
+      drawSourceToCanvas(Math.round(crop.width || crop.naturalWidth), Math.round(crop.height || crop.naturalHeight));
+    });
+
+    dialogWidth.addEventListener('input', () => { updateResizeSummary(); resetCropSelection(); });
+    dialogHeight.addEventListener('input', () => { updateResizeSummary(); resetCropSelection(); });
+    cropZoomInput.addEventListener('input', () => applyCropZoom());
+    cropZoomNumber.addEventListener('input', () => applyCropZoom(cropZoomNumber.value));
+    zoomOutFine.addEventListener('click', (event) => applyCropZoom(Number(cropZoomInput.value) - (event.shiftKey ? 1 : .1)));
+    zoomInFine.addEventListener('click', (event) => applyCropZoom(Number(cropZoomInput.value) + (event.shiftKey ? 1 : .1)));
+    cropXInput.addEventListener('input', () => setCropPosition('x', cropXInput.value));
+    cropYInput.addEventListener('input', () => setCropPosition('y', cropYInput.value));
+    alignButtons.forEach((button) => button.addEventListener('click', () => alignCrop(button.dataset.align)));
+    nudgeButtons.forEach((button) => {
+      button.addEventListener('click', (event) => {
+        const step = event.shiftKey ? 10 : 1;
+        moveCrop(Number(button.dataset.dx) * step, Number(button.dataset.dy) * step);
+        cropCanvas.focus();
+      });
+    });
+    pixelMethod.addEventListener('change', schedulePixelPreview);
+    paletteSize.addEventListener('change', schedulePixelPreview);
+    Object.keys(adjustmentInputs).forEach((key) => {
+      adjustmentInputs[key].addEventListener('input', () => updateAdjustment(key));
+    });
+    resetAdjustments.addEventListener('click', () => {
+      Object.keys(adjustmentInputs).forEach((key) => {
+        adjustmentInputs[key].value = '0';
+        updateAdjustment(key);
+      });
+    });
+    presetButtons.forEach((button) => {
+      button.addEventListener('click', () => {
+        const [width, height] = button.dataset.size.split('x');
+        dialogWidth.value = width;
+        dialogHeight.value = height;
+        presetButtons.forEach((item) => item.classList.toggle('is-active', item === button));
+        resetCropSelection();
+      });
+    });
+
+    cropCanvas.addEventListener('pointerdown', (event) => {
+      if (!cropSelection || !pendingImage) return;
+      cropCanvas.focus();
+      const bounds = cropCanvas.getBoundingClientRect();
+      const display = getCropDisplay();
+      const x = (event.clientX - bounds.left) * (cropCanvas.width / bounds.width);
+      const y = (event.clientY - bounds.top) * (cropCanvas.height / bounds.height);
+      const rectX = display.x + cropSelection.x * display.scale;
+      const rectY = display.y + cropSelection.y * display.scale;
+      const rectW = cropSelection.width * display.scale;
+      const rectH = cropSelection.height * display.scale;
+      if (x < rectX || x > rectX + rectW || y < rectY || y > rectY + rectH) return;
+      cropDrag = { x, y, cropX: cropSelection.x, cropY: cropSelection.y, scale: display.scale };
+      cropCanvas.setPointerCapture(event.pointerId);
+      cropCanvas.classList.add('is-dragging');
+    });
+
+    cropCanvas.addEventListener('pointermove', (event) => {
+      if (!pendingImage) return;
+      const bounds = cropCanvas.getBoundingClientRect();
+      const x = (event.clientX - bounds.left) * (cropCanvas.width / bounds.width);
+      const y = (event.clientY - bounds.top) * (cropCanvas.height / bounds.height);
+      const display = getCropDisplay();
+      cropPointer = {
+        canvasX: x,
+        canvasY: y,
+        sourceX: (x - display.x) / display.scale,
+        sourceY: (y - display.y) / display.scale
+      };
+      if (!cropDrag) {
+        drawCropCanvas();
+        return;
+      }
+      cropSelection.x = snapCropPosition(cropDrag.cropX + (x - cropDrag.x) / cropDrag.scale, cropSelection.width, pendingImage.naturalWidth, 1);
+      cropSelection.y = snapCropPosition(cropDrag.cropY + (y - cropDrag.y) / cropDrag.scale, cropSelection.height, pendingImage.naturalHeight, 1);
+      drawCropCanvas();
+    });
+
+    cropCanvas.addEventListener('pointerleave', () => {
+      cropPointer = null;
+      if (!cropDrag) drawCropCanvas();
+    });
+
+    cropCanvas.addEventListener('keydown', (event) => {
+      const directions = {
+        ArrowLeft: [-1, 0], ArrowRight: [1, 0], ArrowUp: [0, -1], ArrowDown: [0, 1]
+      };
+      if (!directions[event.key]) return;
+      event.preventDefault();
+      const step = event.shiftKey ? 10 : 1;
+      moveCrop(directions[event.key][0] * step, directions[event.key][1] * step);
+    });
+
+    cropCanvas.addEventListener('wheel', (event) => {
+      if (!event.ctrlKey) return;
+      event.preventDefault();
+      const direction = event.deltaY > 0 ? -0.1 : 0.1;
+      applyCropZoom(Number(cropZoomInput.value) + direction);
+    }, { passive: false });
+
+    function stopCropDrag() {
+      cropDrag = null;
+      cropCanvas.classList.remove('is-dragging');
+    }
+
+    cropCanvas.addEventListener('pointerup', stopCropDrag);
+    cropCanvas.addEventListener('pointercancel', stopCropDrag);
+
+    resizeForm.addEventListener('submit', () => {
+      const { width, height } = getDialogSize();
+      sourceImage = pendingImage;
+      committedCrop = { ...cropSelection };
+      pendingImage = null;
+      widthInput.value = String(width);
+      heightInput.value = String(height);
+      imageReady = true;
+      empty.style.display = 'none';
+      canvas.style.display = 'block';
+      resizeImage.disabled = false;
+      naturalSize.disabled = false;
+      drawSourceToCanvas(width, height);
+      cropSelection = null;
+    });
+
+    cancelResize.addEventListener('click', () => {
+      resizeDialog.close();
+      fileInput.value = '';
+      pendingImage = null;
+    });
+
+    resizeDialog.addEventListener('cancel', () => {
+      fileInput.value = '';
+      pendingImage = null;
+    });
+
+    clearMarks.addEventListener('click', () => {
+      marks.innerHTML = '';
+      history.innerHTML = '';
+      countValue.textContent = '-';
+      clearMarks.disabled = true;
+    });
+
+    exportPlan.addEventListener('click', () => {
+      if (!imageReady || !canvas.width || !canvas.height) return;
+
+      const data = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+      const pixels = [];
+      for (let y = 0; y < canvas.height; y += 1) {
+        for (let x = 0; x < canvas.width; x += 1) {
+          const index = (y * canvas.width + x) * 4;
+          pixels.push({
+            x,
+            y,
+            hex: rgbToHex(data[index], data[index + 1], data[index + 2])
+          });
+        }
+      }
+
+      const plan = {
+        format: 'chanon-pixel-automation/v1',
+        width: canvas.width,
+        height: canvas.height,
+        createdAt: new Date().toISOString(),
+        pixels
+      };
+      const blob = new Blob([JSON.stringify(plan, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `chanon-pixel-plan-${canvas.width}x${canvas.height}.json`;
+      link.click();
+      URL.revokeObjectURL(url);
+    });
+  </script>
+</body>
+</html>
