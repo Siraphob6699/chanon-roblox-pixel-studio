@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>STAR Budget</title>
+<meta name="theme-color" content="#fff0f6">
+<style>
+:root{font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;--ink:#382b35;--muted:#8d7787;--pink:#f58db8;--pink2:#ffd6e6;--cream:#fffaf5;--blue:#cfe9ff;--line:#efd9e4}
+*{box-sizing:border-box}body{margin:0;color:var(--ink);background:linear-gradient(180deg,#fff5f9,#fffaf5 45%,#f6fbff);min-height:100vh}button,input,select{font:inherit}
+header{padding:18px 20px;border-bottom:1px solid var(--line);background:rgba(255,255,255,.82);backdrop-filter:blur(14px);position:sticky;top:0;z-index:5}
+.top{width:min(1100px,100%);margin:auto;display:flex;align-items:center;justify-content:space-between;gap:14px}.brand{font-weight:950;font-size:22px}.brand span{color:#e16f9d}.exit{border:1px solid var(--line);background:white;border-radius:12px;padding:9px 12px;color:var(--ink);cursor:pointer}
+main{width:min(1100px,100%);margin:auto;padding:24px 18px 60px}.hero{display:grid;grid-template-columns:1.3fr .7fr;gap:18px;margin-bottom:18px}
+.welcome,.budget-card,.panel{background:rgba(255,255,255,.9);border:1px solid var(--line);border-radius:24px;box-shadow:0 16px 40px rgba(137,83,112,.08)}
+.welcome{padding:26px;background:linear-gradient(135deg,#ffe8f1,#fff9f3)}.welcome h1{margin:0;font-size:clamp(28px,5vw,46px);letter-spacing:-.04em}.welcome p{color:var(--muted);margin:8px 0 0}.budget-card{padding:22px;display:grid;align-content:center;background:linear-gradient(135deg,#edf7ff,#fff)}
+.big{font-size:42px;font-weight:950;letter-spacing:-.05em}.muted{color:var(--muted);font-size:13px}.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px}.stat{background:white;border:1px solid var(--line);border-radius:18px;padding:16px}.stat b{display:block;font-size:24px;margin-top:5px}
+.panel{padding:20px;margin-bottom:18px}.panel h2{margin:0 0 16px;font-size:20px}.form-grid{display:grid;grid-template-columns:1fr 1fr 1fr 1fr 1.3fr auto;gap:10px}
+.field{display:grid;gap:6px}.field label{font-size:12px;font-weight:800;color:var(--muted)}input,select{min-height:44px;border:1px solid var(--line);border-radius:12px;background:#fff;color:var(--ink);padding:0 11px;outline:none}input:focus,select:focus{border-color:#f18ab5;box-shadow:0 0 0 3px rgba(241,138,181,.12)}
+.add{align-self:end;min-height:44px;border:0;border-radius:12px;background:linear-gradient(135deg,#f49ac0,#ffbad6);font-weight:900;color:#4d2337;padding:0 18px;cursor:pointer}
+.presets{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}.preset{border:1px solid var(--line);background:#fff6fa;border-radius:999px;padding:7px 10px;cursor:pointer;font-size:12px}
+table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:12px 10px;border-bottom:1px solid #f3e7ed;font-size:14px}th{font-size:12px;color:var(--muted)}.money{text-align:right;font-weight:900}.income{color:#2e9d71}.expense{color:#d45a88}.delete{border:0;background:#fff0f5;color:#c6507b;border-radius:9px;padding:6px 8px;cursor:pointer}
+.table-wrap{overflow:auto}.empty{text-align:center;color:var(--muted);padding:28px}.summary{display:grid;grid-template-columns:1fr 1fr;gap:14px}.summary-card{padding:18px;border-radius:18px;background:#fff7fb;border:1px solid var(--line)}.summary-card.blue{background:#f3f9ff}.summary-card strong{font-size:28px;display:block;margin:4px 0}.bar{height:10px;border-radius:999px;background:#f4e7ed;overflow:hidden;margin-top:10px}.bar i{display:block;height:100%;background:linear-gradient(90deg,#f49abe,#ee76aa);width:0;transition:width .25s}
+footer{text-align:center;color:#aa91a1;font-size:12px;margin-top:24px}
+@media(max-width:900px){.hero{grid-template-columns:1fr}.grid{grid-template-columns:1fr 1fr}.form-grid{grid-template-columns:1fr 1fr}.add{grid-column:1/-1}.summary{grid-template-columns:1fr}}
+@media(max-width:560px){main{padding:16px 12px 40px}.grid{grid-template-columns:1fr 1fr}.form-grid{grid-template-columns:1fr}.welcome,.panel,.budget-card{border-radius:18px}.big{font-size:34px}th:nth-child(4),td:nth-child(4){display:none}}
+</style>
+</head>
+<body>
+<header><div class="top"><div class="brand">⭐ <span>STAR</span> Budget</div><button class="exit" id="logout">ออกจากหน้าบัญชี</button></div></header>
+<main>
+<section class="hero">
+  <div class="welcome"><h1>บัญชีรายรับ–รายจ่ายของ STAR ⭐</h1><p>จดง่าย ๆ ทุกครั้งที่มีเงินเข้าออก แล้วดูสรุปวันนี้ สัปดาห์นี้ และเดือนนี้ได้ทันที</p></div>
+  <div class="budget-card"><span class="muted">งบรายวันเป้าหมาย</span><div class="big">235 บาท</div><span class="muted">เช้า 35 · กลางวัน 40 · เย็น 50 · เครื่องดื่ม 50 · Grab 60</span></div>
+</section>
+
+<section class="grid">
+  <div class="stat"><span class="muted">ใช้วันนี้</span><b id="todayExpense">0 ฿</b></div>
+  <div class="stat"><span class="muted">เหลืองบวันนี้</span><b id="todayLeft">235 ฿</b></div>
+  <div class="stat"><span class="muted">รายรับเดือนนี้</span><b id="monthIncome">0 ฿</b></div>
+  <div class="stat"><span class="muted">รายจ่ายเดือนนี้</span><b id="monthExpense">0 ฿</b></div>
+</section>
+
+<section class="panel">
+<h2>➕ เพิ่มรายการ</h2>
+<form id="entryForm" class="form-grid">
+  <div class="field"><label>วันที่</label><input id="date" type="date" required></div>
+  <div class="field"><label>ประเภท</label><select id="type"><option value="expense">รายจ่าย</option><option value="income">รายรับ</option></select></div>
+  <div class="field"><label>หมวด</label><select id="category"></select></div>
+  <div class="field"><label>จำนวนเงิน</label><input id="amount" type="number" min="0" step="1" inputmode="decimal" placeholder="0" required></div>
+  <div class="field"><label>รายละเอียด</label><input id="note" type="text" maxlength="80" placeholder="เช่น ข้าวกะเพรา"></div>
+  <button class="add" type="submit">บันทึก</button>
+</form>
+<div class="presets" id="presets"></div>
+</section>
+
+<section class="panel">
+<h2>📊 สรุปงบ</h2>
+<div class="summary">
+  <div class="summary-card"><span class="muted">สัปดาห์นี้</span><strong id="weekExpense">0 ฿</strong><div class="muted">เป้าหมาย 1,645 บาท / 7 วัน</div><div class="bar"><i id="weekBar"></i></div></div>
+  <div class="summary-card blue"><span class="muted">เดือนนี้</span><strong id="monthNet">0 ฿</strong><div class="muted">คงเหลือสุทธิ = รายรับ − รายจ่าย</div></div>
+</div>
+</section>
+
+<section class="panel">
+<h2>🧾 ประวัติรายการ</h2>
+<div class="table-wrap"><table>
+<thead><tr><th>วันที่</th><th>รายการ</th><th>หมวด</th><th>ประเภท</th><th class="money">จำนวน</th><th></th></tr></thead>
+<tbody id="rows"></tbody>
+</table><div id="empty" class="empty">ยังไม่มีรายการ เริ่มบันทึกรายการแรกได้เลย 🌷</div></div>
+</section>
+<footer>ข้อมูลถูกเก็บไว้ในเบราว์เซอร์ของอุปกรณ์นี้</footer>
+</main>
+<script>
+if(sessionStorage.getItem('star-budget-auth')!=='ok'){location.replace('./index.html')}
+const DAILY=235,WEEKLY=1645;
+const expenseCats=['อาหารเช้า','อาหารกลางวัน','อาหารเย็น','กาแฟ / น้ำหวาน / น้ำปั่น','Grab','ของใช้ส่วนตัว','มหาลัย / เรียน','เที่ยว / กิจกรรม','อื่น ๆ'];
+const incomeCats=['เงินประจำ','เงินพิเศษ','เงินคืน','รายได้อื่น'];
+const presets=[['อาหารเช้า',35],['อาหารกลางวัน',40],['อาหารเย็น',50],['กาแฟ / น้ำหวาน / น้ำปั่น',50],['Grab',60]];
+const $=id=>document.getElementById(id);
+$('date').value=new Date().toISOString().slice(0,10);
+function load(){try{return JSON.parse(localStorage.getItem('star-budget-entries')||'[]')}catch{return[]}}
+function save(v){localStorage.setItem('star-budget-entries',JSON.stringify(v))}
+let entries=load();
+function money(n){return new Intl.NumberFormat('th-TH',{maximumFractionDigits:0}).format(n)+' ฿'}
+function updateCategories(){
+ const list=$('type').value==='income'?incomeCats:expenseCats;
+ $('category').innerHTML=list.map(x=>'<option>'+x+'</option>').join('');
+ $('presets').style.display=$('type').value==='expense'?'flex':'none';
+}
+$('type').addEventListener('change',updateCategories);updateCategories();
+$('presets').innerHTML=presets.map(([n,a])=>'<button type="button" class="preset" data-cat="'+n+'" data-amount="'+a+'">'+n+' '+a+'฿</button>').join('');
+$('presets').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;$('category').value=b.dataset.cat;$('amount').value=b.dataset.amount;$('note').focus()});
+$('entryForm').addEventListener('submit',e=>{
+ e.preventDefault();const amount=Number($('amount').value);if(!amount)return;
+ entries.unshift({id:Date.now(),date:$('date').value,type:$('type').value,category:$('category').value,amount,note:$('note').value.trim()});
+ save(entries);$('amount').value='';$('note').value='';render();
+});
+function startOfWeek(d){const x=new Date(d);const day=(x.getDay()+6)%7;x.setHours(0,0,0,0);x.setDate(x.getDate()-day);return x}
+function render(){
+ const now=new Date(),today=now.toISOString().slice(0,10),month=today.slice(0,7),weekStart=startOfWeek(now);
+ const isThisWeek=e=>new Date(e.date+'T00:00:00')>=weekStart&&new Date(e.date+'T00:00:00')<=now;
+ const expenses=entries.filter(e=>e.type==='expense'),income=entries.filter(e=>e.type==='income');
+ const todayExpense=expenses.filter(e=>e.date===today).reduce((s,e)=>s+e.amount,0);
+ const monthExpense=expenses.filter(e=>e.date.startsWith(month)).reduce((s,e)=>s+e.amount,0);
+ const monthIncome=income.filter(e=>e.date.startsWith(month)).reduce((s,e)=>s+e.amount,0);
+ const weekExpense=expenses.filter(isThisWeek).reduce((s,e)=>s+e.amount,0);
+ $('todayExpense').textContent=money(todayExpense);$('todayLeft').textContent=money(Math.max(0,DAILY-todayExpense));
+ $('monthExpense').textContent=money(monthExpense);$('monthIncome').textContent=money(monthIncome);$('weekExpense').textContent=money(weekExpense);$('monthNet').textContent=money(monthIncome-monthExpense);
+ $('weekBar').style.width=Math.min(100,(weekExpense/WEEKLY)*100)+'%';
+ $('rows').innerHTML=entries.map(e=>'<tr><td>'+e.date+'</td><td>'+(e.note||e.category)+'</td><td>'+e.category+'</td><td class="'+e.type+'">'+(e.type==='income'?'รายรับ':'รายจ่าย')+'</td><td class="money '+e.type+'">'+(e.type==='income'?'+':'-')+money(e.amount)+'</td><td><button class="delete" data-id="'+e.id+'">ลบ</button></td></tr>').join('');
+ $('empty').style.display=entries.length?'none':'block';
+}
+$('rows').addEventListener('click',e=>{const b=e.target.closest('.delete');if(!b)return;if(confirm('ลบรายการนี้ใช่ไหม?')){entries=entries.filter(x=>String(x.id)!==b.dataset.id);save(entries);render()}});
+$('logout').addEventListener('click',()=>{sessionStorage.removeItem('star-budget-auth');location.href='./index.html'});
+render();
+</script>
+</body>
+</html>
