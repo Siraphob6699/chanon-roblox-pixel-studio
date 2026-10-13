@@ -14,7 +14,16 @@
         error.textContent = 'รหัสไม่ถูกต้อง กรุณาลองใหม่'; input.focus(); input.select(); return;
       }
       sessionStorage.setItem('chanon-education-auth', 'ok');
-      input.value = ''; location.href = './education/';
+      input.value = '';
+      let destination = new URL('./education/', location.href);
+      const requested = new URL(location.href).searchParams.get('education_return');
+      if (requested) {
+        try {
+          const target = new URL(requested, location.href);
+          if (target.origin === destination.origin && target.pathname.startsWith('/education/') && !target.username && !target.password) destination = target;
+        } catch { /* Keep the normal subject chooser for an invalid return URL. */ }
+      }
+      location.href = destination.href;
     } catch {
       error.textContent = 'ยังเข้าใช้งานไม่ได้ กรุณาเปิดผ่าน HTTPS และอนุญาตการบันทึกข้อมูลในเบราว์เซอร์';
     } finally { button.disabled = false; }
