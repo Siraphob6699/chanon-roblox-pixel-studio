@@ -38,6 +38,7 @@
       <form id="education-login">
         <div class="field"><label for="education-passcode">กรอกรหัสเพื่อเข้าสื่อการสอน</label><input id="education-passcode" name="password" type="password" inputmode="numeric" autocomplete="off" maxlength="12" placeholder="กรอกรหัส" required></div>
         <div class="actions"><button class="btn primary" type="submit" id="enterEducation" style="width:100%">เข้าสู่สื่อการสอน →</button></div>
+        <p class="note" id="education-session-note"></p>
         <div id="education-error" class="error" role="status" aria-live="polite"></div>
       </form>
     </article>
@@ -50,5 +51,5 @@ const input=document.getElementById('passcode'),error=document.getElementById('e
 async function go(){error.textContent='';const pass=input.value.trim();const hash=await sha256(pass);if(hash==='ec9c3833d2daef77604a3cfc097bbc5e919e4c96e8fd13bc34fdf0a2e4474e79'){sessionStorage.setItem('star-budget-auth','ok');sessionStorage.setItem('star-budget-passcode',pass);location.href='./budget.html'}else{error.textContent='รหัสไม่ถูกต้อง กรุณาลองใหม่';input.focus();input.select()}}
 document.getElementById('enterBudget').addEventListener('click',go);input.addEventListener('keydown',e=>{if(e.key==='Enter')go()});
 </script>
-<script src="./education/login.js"></script>
+<script src="./education/auth.js?v=20261013-shared-access-v2"></script><script src="./education/login.js?v=20261013-shared-access-v2"></script>
 </body></html>
